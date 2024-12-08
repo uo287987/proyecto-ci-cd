@@ -1,0 +1,35 @@
+name: CI Pipeline
+
+# Eventos que activan el pipeline
+on:
+  push:
+    branches:
+      - main  # Se ejecutará cuando haya un push en la rama `main`
+  pull_request:
+    branches:
+      - main  # Se ejecutará en solicitudes de PR hacia `main`
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest  # Entorno base (Linux)
+
+    steps:
+      # 1. Clonar el código fuente
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Configurar Python
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9  # Versión de Python requerida
+
+      # 3. Instalar dependencias
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Ejecutar pruebas
+      - name: Run tests
+        run: pytest tests/
