@@ -1,6 +1,5 @@
 name: CI Pipeline
 
-# Eventos que activan el pipeline
 on:
   push:
     branches:
@@ -10,7 +9,6 @@ on:
       - main 
 
 jobs:
-
   job1:
     runs-on: ubuntu-latest  
 
@@ -36,15 +34,19 @@ jobs:
         run: pytest tests/
 
   sonarqube:
-  name: SonarQube
-  needs: job1
-  runs-on: windows-latest
-  steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-    - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v4
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    needs: job1
+    runs-on: ubuntu-latest  # Cambiado a ubuntu para mayor compatibilidad con SonarQube
+
+    steps:
+      # 1. Clonar el repositorio con todo el historial
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Clonado completo para análisis relevante
+
+      # 2. Escaneo de SonarQube
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Token de GitHub para información de PR
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Token de autenticación para SonarQube
